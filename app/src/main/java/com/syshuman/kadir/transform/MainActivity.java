@@ -1,8 +1,11 @@
 package com.syshuman.kadir.transform;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.opengl.GLSurfaceView;
@@ -21,6 +24,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.syshuman.kadir.transform.fragments.SoundData;
 
@@ -30,19 +34,25 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    GLSurfaceView.Renderer renderer;
 
     @BindView(R.id.surfaceView) GLSurfaceView glSurfaceView;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.status) FloatingActionButton status;
     @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
 
-    Intent intent;
+    private GLSurfaceView.Renderer renderer;
+
     private SoundData soundData;
     private Boolean inRecord = false;
+    private Context context;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+        context = getBaseContext();
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -50,19 +60,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ButterKnife.bind(this);
         getPermissions();
 
-        glSurfaceView.setEGLContextClientVersion(2);
 
-        renderer = new MyRenderer();
-        soundData = new SoundData();
-        soundData.init(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        initialize();
 
-        glSurfaceView.setRenderer(renderer);
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        status.setOnClickListener(onStatusClicked);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -70,6 +71,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        status.setOnClickListener(onStatusClicked);
+
+    }
+
+    private void initialize() {
+
+        renderer = new MyRenderer(context);
+        soundData = new SoundData(this);
+        soundData.init(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+        if(hasGLES20()) {
+            glSurfaceView.setEGLContextClientVersion(2);
+            glSurfaceView.setPreserveEGLContextOnPause(true);
+            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            glSurfaceView.setRenderer(renderer);
+        } else {
+            Toast.makeText(getBaseContext(), "No OPENGL", Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -88,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 status.setImageResource(R.drawable.ic_play);
                 Snackbar.make(view, "Process Stopped !!!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
             }
-
         }
     };
 
@@ -151,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
-
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.nav_fourier:
                 intent = new Intent(this, SettingsActivity.class);
@@ -203,4 +221,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
+
+    private boolean hasGLES20() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
+        return info.reqGlEsVersion >= 0x20000;
+    }
 }
