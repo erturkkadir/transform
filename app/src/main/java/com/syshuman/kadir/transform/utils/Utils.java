@@ -1,7 +1,6 @@
-package com.syshuman.kadir.transform.Utils;
+package com.syshuman.kadir.transform.utils;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.Gravity;
@@ -36,8 +35,6 @@ public class Utils {
                 dialog.show();
             }
         });
-
-
     }
 
     public void showToast(String message) {

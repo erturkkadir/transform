@@ -17,6 +17,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +36,9 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.opengl.ETC1.getHeight;
+import static android.opengl.ETC1.getWidth;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
@@ -46,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    private GLSurfaceView.Renderer renderer;
 
     private SoundData soundData;
     private Boolean inRecord = false;
@@ -56,6 +59,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int sgn_len, sgn_frq;
     private boolean dyn_amp = false;
     private String fft_dim = "3D";
+
+    private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
+    private float mPreviousX;
+    private float mPreviousY;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         initialize();
-
     }
 
     private void initialize() {
@@ -93,18 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         soundData = new SoundData(this, sgn_len, sgn_frq, dyn_amp, fft_dim);
         soundData.init();
 
-        renderer = new MyRenderer(context);
-        if(hasGLES20()) {
-            glSurfaceView.setEGLContextClientVersion(2);
-            glSurfaceView.setPreserveEGLContextOnPause(true);
-//            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-            glSurfaceView.setRenderer(renderer);
-        } else {
-            Toast.makeText(getBaseContext(), "No OPENGL", Toast.LENGTH_LONG).show();
-        }
-
         status.setOnClickListener(onStatusClicked);
-
     }
 
 
@@ -154,13 +150,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        //glSurfaceView.onResume();
+        glSurfaceView.onResume();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //glSurfaceView.onPause();
+        glSurfaceView.onPause();
     }
 
     @Override

@@ -7,11 +7,9 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import com.syshuman.kadir.transform.Utils.Utils;
+import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
-
-import static java.lang.Math.sqrt;
 
 public class SoundData {
 
@@ -127,7 +125,7 @@ public class SoundData {
     public void stop() {
 
         audioRecord.stop();
-        //aThread.interrupt();
+        aThread.interrupt();
 
 
     }
