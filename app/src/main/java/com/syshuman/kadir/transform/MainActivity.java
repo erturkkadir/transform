@@ -11,6 +11,7 @@ import android.media.AudioFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,6 +28,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.syshuman.kadir.transform.fragments.SoundData;
+import com.syshuman.kadir.transform.model.Preferences;
+
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     @BindView(R.id.surfaceView) GLSurfaceView glSurfaceView;
+
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.status) FloatingActionButton status;
     @BindView(R.id.nav_view) NavigationView navigationView;
@@ -47,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Boolean inRecord = false;
     private Context context;
 
+    private Preferences preferences;
+    private int sgn_len, sgn_frq;
+    private boolean dyn_amp = false;
+    private String fft_dim = "3D";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +67,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
         getPermissions();
-
-
-        initialize();
 
         setSupportActionBar(toolbar);
 
@@ -71,26 +78,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        status.setOnClickListener(onStatusClicked);
+        initialize();
 
     }
 
     private void initialize() {
 
-        renderer = new MyRenderer(context);
-        soundData = new SoundData(this);
-        soundData.init(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        // log_visit("http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
 
+        getDefaults(); /* set default values of each transforms */
+
+
+        soundData = new SoundData(this, sgn_len, sgn_frq, dyn_amp, fft_dim);
+        soundData.init();
+
+        renderer = new MyRenderer(context);
         if(hasGLES20()) {
             glSurfaceView.setEGLContextClientVersion(2);
             glSurfaceView.setPreserveEGLContextOnPause(true);
-            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+//            glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
             glSurfaceView.setRenderer(renderer);
         } else {
             Toast.makeText(getBaseContext(), "No OPENGL", Toast.LENGTH_LONG).show();
         }
+
+        status.setOnClickListener(onStatusClicked);
+
     }
 
+
+    public void getDefaults() {
+        preferences = new Preferences(this);
+        HashMap<String, String> prefs = preferences.getAllPrefs();
+        sgn_len = Integer.valueOf(prefs.get("sgn_len"));
+        sgn_frq = Integer.valueOf(prefs.get("sgn_frq"));
+        dyn_amp = Boolean.valueOf(prefs.get("dyn_amp"));
+        fft_dim = String.valueOf(prefs.get("fft_dim"));
+    }
 
     View.OnClickListener onStatusClicked = new View.OnClickListener() {
         @Override
@@ -129,13 +154,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        glSurfaceView.onResume();
+        //glSurfaceView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        glSurfaceView.onPause();
+        //glSurfaceView.onPause();
     }
 
     @Override

@@ -8,14 +8,12 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.view.Gravity;
 import android.widget.Toast;
-
-import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
 
 public class Audio implements Runnable {
 
     protected  boolean lock;
-    protected Thread thread;
+    private Thread thread;
     private short[] data;
     private int minBufSize;
     private int sfreq, sgn_len;
@@ -98,7 +96,7 @@ public class Audio implements Runnable {
             }
 
             FFT fft = new FFT();
-            Complex c_data = fft.fft_real(data);
+            //fft.fft_real(c_data);
 
 
             float df = (sfreq * 1.0f) / (sgn_len * 1.0f); // 11025 / 4096 = 1.35 Hz  6000 Hz

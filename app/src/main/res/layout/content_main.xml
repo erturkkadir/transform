@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,5 +19,44 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintVertical_bias="0.057" />
+
+    <LinearLayout
+
+        android:layout_width="279dp"
+        android:layout_height="59dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/surfaceView"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
+        <ImageButton
+            android:id="@+id/btnFourier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_fourier" />
+
+        <ImageButton
+            android:id="@+id/btnLaplace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_laplace" />
+
+
+        <ImageButton
+            android:id="@+id/btnZ"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_z" />
+
+
+
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

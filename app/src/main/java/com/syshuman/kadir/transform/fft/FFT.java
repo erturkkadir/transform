@@ -9,9 +9,7 @@ public class FFT {
     public FFT() {
     }
 
-    public Complex fft_real(short data[]) {
-
-        Complex c_data = new Complex(data);
+    public void fft_real(Complex c_data) {
 
         final int n = c_data.d_real.length;
         final double norm = Math.sqrt(1.0 / n);
@@ -49,9 +47,7 @@ public class FFT {
                 }
             }
         }
-        return c_data;
     }
-
 }
 
 
