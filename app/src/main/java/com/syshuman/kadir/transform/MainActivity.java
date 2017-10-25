@@ -30,6 +30,9 @@ import android.widget.Toast;
 
 import com.syshuman.kadir.transform.fragments.SoundData;
 import com.syshuman.kadir.transform.model.Preferences;
+import com.syshuman.kadir.transform.utils.Utils;
+import com.syshuman.kadir.transform.view.OpenGLRenderer;
+import com.syshuman.kadir.transform.view.OpenGLView;
 
 import java.util.HashMap;
 
@@ -42,13 +45,12 @@ import static android.opengl.ETC1.getWidth;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-
-    @BindView(R.id.surfaceView) GLSurfaceView glSurfaceView;
-
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.status) FloatingActionButton status;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.toolbar) Toolbar toolbar;
+
+    @BindView(R.id.surfaceView) GLSurfaceView glTSurfaceView;
 
 
     private SoundData soundData;
@@ -60,9 +62,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean dyn_amp = false;
     private String fft_dim = "3D";
 
-    private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
-    private float mPreviousX;
-    private float mPreviousY;
+    private Utils utils;
+
+    private GLSurfaceView glSurfaceView;
 
 
     @Override
@@ -86,10 +88,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        utils = new Utils(this);
+
         initialize();
     }
 
     private void initialize() {
+
 
         String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         // log_visit("http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
@@ -101,6 +106,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         soundData.init();
 
         status.setOnClickListener(onStatusClicked);
+
+
+        if (hasGLES20()) {
+            glSurfaceView.setEGLContextClientVersion(2);
+            glSurfaceView.setPreserveEGLContextOnPause(true);
+
+
+        } else {
+            utils.showError("Time to buy a new phone. OpenGL 2.0 not supported");
+        }
     }
 
 
@@ -150,14 +165,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        glSurfaceView.onResume();
+       //glSurfaceView.onResume();
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        glSurfaceView.onPause();
+        //glSurfaceView.onPause();
     }
 
     @Override
@@ -190,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.nav_fourier:
@@ -242,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
     }
-
 
 
     private boolean hasGLES20() {

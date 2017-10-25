@@ -35,12 +35,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW">
 
-
                 </action>
-
             </intent-filter>
-
-
         </activity>
     </application>
 
