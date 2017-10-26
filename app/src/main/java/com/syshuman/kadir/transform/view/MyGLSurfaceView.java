@@ -21,7 +21,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
         this.context = context;
         myGLRenderer = new MyGLRenderer();
         setRenderer(myGLRenderer);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -52,6 +54,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
                         myGLRenderer.getAngle() +
                                 ((dx + dy) * TOUCH_SCALE_FACTOR));  // = 180.0f / 320
                 requestRender();
+                break;
+            case MotionEvent.ACTION_DOWN :
+
+                // Remember where we started
+                mPreviousX = x;
+                mPreviousY = y;
+
+                break;
         }
 
         mPreviousX = x;

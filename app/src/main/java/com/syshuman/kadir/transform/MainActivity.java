@@ -15,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -97,9 +98,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         soundData.init();
 
         status.setOnClickListener(onStatusClicked);
-
-       // glSurfaceView = new MyGLSurfaceView(this);
-       // setContentView(glSurfaceView);
 
     }
 
@@ -249,4 +247,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
         return info.reqGlEsVersion >= 0x20000;
     }
+
 }
