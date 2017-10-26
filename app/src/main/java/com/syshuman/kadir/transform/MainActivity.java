@@ -4,10 +4,8 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
-import android.media.AudioFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,7 +15,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,21 +23,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.syshuman.kadir.transform.fragments.SoundData;
 import com.syshuman.kadir.transform.model.Preferences;
 import com.syshuman.kadir.transform.utils.Utils;
-import com.syshuman.kadir.transform.view.OpenGLRenderer;
-import com.syshuman.kadir.transform.view.OpenGLView;
+import com.syshuman.kadir.transform.view.MyGLRenderer;
+import com.syshuman.kadir.transform.view.MyGLSurfaceView;
 
 import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static android.opengl.ETC1.getHeight;
-import static android.opengl.ETC1.getWidth;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    @BindView(R.id.surfaceView) GLSurfaceView glTSurfaceView;
+    @BindView(R.id.glSurfaceView) MyGLSurfaceView glSurfaceView;
 
 
     private SoundData soundData;
@@ -63,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String fft_dim = "3D";
 
     private Utils utils;
-
-    private GLSurfaceView glSurfaceView;
 
 
     @Override
@@ -107,15 +98,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         status.setOnClickListener(onStatusClicked);
 
+       // glSurfaceView = new MyGLSurfaceView(this);
+       // setContentView(glSurfaceView);
 
-        if (hasGLES20()) {
-            glSurfaceView.setEGLContextClientVersion(2);
-            glSurfaceView.setPreserveEGLContextOnPause(true);
-
-
-        } else {
-            utils.showError("Time to buy a new phone. OpenGL 2.0 not supported");
-        }
     }
 
 
@@ -165,14 +150,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-       //glSurfaceView.onResume();
+        glSurfaceView.onResume();
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //glSurfaceView.onPause();
+        glSurfaceView.onPause();
     }
 
     @Override

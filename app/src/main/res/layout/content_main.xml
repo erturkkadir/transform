@@ -11,12 +11,13 @@
     tools:context="com.syshuman.kadir.transform.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <com.syshuman.kadir.transform.view.OpenGLView
-        android:id="@+id/surfaceView"
+    <com.syshuman.kadir.transform.view.MyGLSurfaceView
+        android:id="@+id/glSurfaceView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/linearLayout"
         android:layout_alignParentTop="true" />
+
 
     <LinearLayout
 
