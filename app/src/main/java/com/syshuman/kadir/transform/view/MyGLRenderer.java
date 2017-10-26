@@ -85,12 +85,14 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // such as screen rotation
         GLES20.glViewport(0, 0, width, height);
 
-        float ratio = (float) width / height;
+        float ratio = (float) width / height; // 0.6880 for Samsung
+        float zoom = 2f;
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
-       // GLES20.glFrustumf(width/2 * zoom, width/2 * zoom, height/2 * zoom, height/2 * zoom, 1, -1);
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, ratio, -ratio, 3, 5);
+
+
 
     }
 

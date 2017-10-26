@@ -55,7 +55,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                 ((dx + dy) * TOUCH_SCALE_FACTOR));  // = 180.0f / 320
                 requestRender();
                 break;
-            case MotionEvent.ACTION_DOWN :
+            case MotionEvent.ACTION_POINTER_DOWN :
 
                 // Remember where we started
                 mPreviousX = x;

@@ -34,17 +34,15 @@ public class Triangle {
     // number of coordinates per vertex in this array
     private final int COORDS_PER_VERTEX = 3;
     private float triangleCoords[] = {
-            // in counterclockwise order:
-            0.0f, 0.622008459f, 0.8f,   // top
-            0.2f, 0.411004243f, 0.2f,   // bottom left
-            0.4f, 0.311004243f, 0.4f,    // bottom right
-            0.6f, 0.211004243f, 0.6f    // bottom right
+             0.0f,  0.688f, 0.0f, // top
+            -0.688f,  0.0f, 0.0f, // bottom left
+             0.688f,  0.0f, 0.0f  // bottom right
 
     };
     private int vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
     private int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
-    private float color[] = {0.03671875f, 0.76953125f, 0.22265625f, 0.0f};
+    private float color[] = {0.03671875f, 0.76953125f, 0.22265625f, 1.0f};
 
     public Triangle() {
         ByteBuffer bb = ByteBuffer.allocateDirect(triangleCoords.length * 4);
