@@ -5,32 +5,32 @@ import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.util.Log;
 
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
 
+import java.util.Arrays;
+
 public class SoundData {
 
-    private int bufferSize;
+    //private int bufferSize;
     private AudioRecord audioRecord;
     private Thread aThread;
 
     private int sgn_len;  // 1024
     private int sgn_frq; // 44100
-    private boolean dyn_amp;
-    private String fft_dim;
+    private int bufferSize;
 
-    private short[] data;
+
+    private short[] audioData;
     private Complex c_data;
     private Utils utils;
 
+    private boolean dyn_amp;
+    private String fft_dim;
+
     private FFT fft;
-    private float sig_ = 0.0f;
-    private float rad = 0.0f;
-    private String method = "F";
-    private double[][][] g_data;
 
     public SoundData(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
 
@@ -38,79 +38,54 @@ public class SoundData {
         this.sgn_frq = sgn_frq;
         this.dyn_amp = dyn_amp; // False default
         this.fft_dim = fft_dim; // 3D default
-        data = new short[sgn_len];
+        audioData = new short[sgn_len];
         c_data = new Complex(sgn_len);
-       // g_data = new double[sgn_len][sgn_len][sgn_len];
+        // g_data = new double[sgn_len][sgn_len][sgn_len];
         utils = new Utils(activity);
+
+        aThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    recordAudio();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
     public void init() {
 
-        bufferSize = AudioRecord.getMinBufferSize(sgn_frq, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        int channel = AudioFormat.CHANNEL_IN_MONO;
+        int format = AudioFormat.ENCODING_PCM_16BIT;
+        int source = MediaRecorder.AudioSource.MIC;
+
+
+        bufferSize = AudioRecord.getMinBufferSize(sgn_frq, channel, format);
+
+        if (sgn_len > bufferSize) {
+            utils.showError("Signal length must smaller than buffersize. Signal Length : " + sgn_len + " buffer size : " + bufferSize);
+            return;
+        }
 
         if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE || bufferSize < 0) {
             utils.showError("Buffer size error or AudioRecord error ");
             return;
         }
 
-        audioRecord = new AudioRecord(
-                MediaRecorder.AudioSource.DEFAULT,
+        audioRecord = new AudioRecord(source,
                 sgn_frq,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
-                bufferSize);
+                channel,
+                format,
+                2 * bufferSize);
 
         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-            Log.e("Error", "Audio cant init");
-            utils.showError("Auido could not initialize ");
+            utils.showError("Audio could not initialize ");
             return;
         }
 
-        fft = new FFT();
-
-        aThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                while (aThread != null) {
-                    int size = audioRecord.read(data, 0, sgn_len);
-                    if (size == 0) {
-                        utils.showError("Unable to fetch data from audioRecord ....");
-                        return;
-                    }
-                    if (method == "F") {
-
-                        for (int i = 0; i < sgn_len; i++) {
-                            c_data.d_real[i] = data[i];
-                            c_data.d_imag[i] = 0.0;
-                        }
-                    }
-
-
-                    fft.fft_real(c_data);
-
-
-                    float df = (sgn_frq * 1.0f) / (sgn_len * 1.0f); // 44100 / 1024 = 43.06 Hz  is delta freq
-
-                    if (fft_dim.equals("2D")) {
-                        for (int i = 0; i < sgn_len / 2; i++) {
-                            double x = i * df * 1.0;
-                            double y = 0;
-                            double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]);
-                            //gdata
-
-                        }
-                    } else {
-                        for (int i = 0; i < sgn_len / 2; i++) {
-                            double x = i * df * 1.0;
-                            double y = c_data.d_real[i];
-                            double z = c_data.d_imag[i];
-                        }
-                    }
-                }
-
-            }
-        });
+        aThread.start();
 
     }
 
@@ -126,14 +101,42 @@ public class SoundData {
 
         audioRecord.stop();
         aThread.interrupt();
-
-
-    }
-
-    public void release() {
         audioRecord.release();
+
     }
 
 
+    private void recordAudio() throws InterruptedException {
 
+        audioRecord.startRecording();
+        Thread.sleep(50);
+        int offset = 0, read = 1;
+        while (offset < bufferSize) {
+            int size = audioRecord.read(audioData, 0, sgn_len);
+            offset += size;
+            if (read <= 0) break;
+        }
+        audioRecord.stop();
+        audioData = Arrays.copyOf(audioData, sgn_len);
+        callGraph(audioData);
+    }
+
+    private void callGraph(short[] data) {
+        for (int i = 0; i < sgn_len; i++) {
+            c_data.d_real[i] = data[i];
+            c_data.d_imag[i] = 0.0;
+        }
+
+        fft = new FFT();
+        fft.fft_real(c_data);
+
+        float df = (sgn_frq * 1.0f) / (sgn_len * 1.0f); // 44100 / 1024 = 43.06 Hz  is delta freq
+
+        for (int i = 0; i < sgn_len / 2; i++) {
+            double x = i * df * 1.0;
+            double y = 0;
+            double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]);
+
+        }
+    }
 }

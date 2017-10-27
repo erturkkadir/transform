@@ -34,9 +34,9 @@ public class Triangle {
     // number of coordinates per vertex in this array
     private final int COORDS_PER_VERTEX = 3;
     private float triangleCoords[] = {
-             0.0f,  0.688f, 0.0f, // top
-            -0.688f,  0.0f, 0.0f, // bottom left
-             0.688f,  0.0f, 0.0f  // bottom right
+            0.0f,  0.0f, 0.0f, // top
+            1.0f,  1.0f, 1.0f, // bottom left
+
 
     };
     private int vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
@@ -63,33 +63,24 @@ public class Triangle {
     }
 
     public void draw(float[] mvpMatrix) {
-        GLES20.glUseProgram(mProgram);              // add program to OpenGL environment
 
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");  // get handle to vertex shader's vPosition member
-
-        GLES20.glEnableVertexAttribArray(mPositionHandle);  // Enable a handle to the triangle vertices
-
+        GLES20.glUseProgram(mProgram);                                          // add program to OpenGL environment
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");    // get handle to vertex shader's vPosition member
+        GLES20.glEnableVertexAttribArray(mPositionHandle);                      // Enable a handle to the triangle vertices
 
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, vertexBuffer); // Prepare the triangle coordinate data
+        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");         // get handle to fragment shaders vColor member
 
-
-        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor"); // get handle to fragment shaders vColor member
-
-        GLES20.glUniform4fv(mColorHandle, 1, color, 0); // set color for drawing the triangle
-
+        GLES20.glUniform4fv(mColorHandle, 1, color, 0);                         // set color for drawing the triangle
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix"); // get handle to shape's transformation matrix
         MyGLRenderer.checkGlError("glGetUniformLocation");
 
-
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);    // Apply the projection and view transformation
         MyGLRenderer.checkGlError("glUniformMatrix4fv");
 
-
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);  // Draw the triangle
-
-        GLES20.glDisableVertexAttribArray(mPositionHandle);  // Disable vertex array
+        GLES20.glDrawArrays(GLES20.GL_LINES, 0, vertexCount);                   // Draw the triangle
+        GLES20.glDisableVertexAttribArray(mPositionHandle);                     // Disable vertex array
     }
 
 }

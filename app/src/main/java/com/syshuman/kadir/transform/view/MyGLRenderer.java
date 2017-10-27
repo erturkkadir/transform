@@ -47,24 +47,50 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);  // Draw background color
 
 
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, -1.0f, 0.0f);  // Set the camera position (View matrix)
-
+        Matrix.setLookAtM(mViewMatrix, 0, 2f, 2f, 2f, 0f, 0f, 0f, 0f, 0.0f, 1.0f);  // Set the camera position (View matrix)
+        /*
+         * Defines a viewing transformation in terms of an eye point, a center of
+         * view, and an up vector.
+         *
+         * @param rm returns the result
+         * @param rmOffset index into rm where the result matrix starts
+         * @param eyeX eye point X
+         * @param eyeY eye point Y
+         * @param eyeZ eye point Z
+         * @param centerX center of view X
+         * @param centerY center of view Y
+         * @param centerZ center of view Z
+         * @param upX up vector X
+         * @param upY up vector Y
+         * @param upZ up vector Z
+         */
 
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);  // Calculate the projection and view transformation
 
-        // Draw square
-        //mSquare.draw(mMVPMatrix);
+        /**
+         * Multiplies a 4 element vector by a 4x4 matrix and stores the result in a
+         * 4-element column vector. In matrix notation: result = lhs x rhs
+         * <p>
+         * The same float array may be passed for resultVec, lhsMat, and/or rhsVec.
+         * However, the resultVec element values are undefined if the resultVec
+         * elements overlap either the lhsMat or rhsVec elements.
+         *
+         * @param resultVec The float array that holds the result vector.
+         * @param resultVecOffset The offset into the result array where the result
+         *        vector is stored.
+         * @param lhsMat The float array that holds the left-hand-side matrix.
+         * @param lhsMatOffset The offset into the lhs array where the lhs is stored
+         * @param rhsVec The float array that holds the right-hand-side vector.
+         * @param rhsVecOffset The offset into the rhs vector where the rhs vector
+         *        is stored.
+         *
+         * @throws IllegalArgumentException if resultVec, lhsMat,
+         * or rhsVec are null, or if resultVecOffset + 4 > resultVec.length
+         * or lhsMatOffset + 16 > lhsMat.length or
+         * rhsVecOffset + 4 > rhsVec.length.
+         */
 
-        // Create a rotation for the triangle
 
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-        // long time = SystemClock.uptimeMillis() % 4000L;
-        // float angle = 0.090f * ((int) time);
-
-        long time = SystemClock.uptimeMillis() % 4000L;
-        float angle = 0.090f * ((int) time);
-        Matrix.setRotateM(mRotationMatrix, 0, angle, 0, 0, 1.0f);
         Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, -1.0f);
 
         // Combine the rotation matrix with the projection and camera view
@@ -91,8 +117,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, ratio, -ratio, 3, 5);
-
-
 
     }
 
