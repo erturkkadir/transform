@@ -9,7 +9,9 @@ import android.media.MediaRecorder;
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
+import com.syshuman.kadir.transform.view.MyGraph;
 
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 public class SoundData {
@@ -122,6 +124,10 @@ public class SoundData {
     }
 
     private void callGraph(short[] data) {
+        float[] dataBuffer;
+
+        dataBuffer = new float[sgn_len*3];
+
         for (int i = 0; i < sgn_len; i++) {
             c_data.d_real[i] = data[i];
             c_data.d_imag[i] = 0.0;
@@ -136,7 +142,10 @@ public class SoundData {
             double x = i * df * 1.0;
             double y = 0;
             double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]);
-
+            dataBuffer[3*i] = (float) x;
+            dataBuffer[3*i+1] = (float) y;
+            dataBuffer[3*i+2] = (float) z;
         }
+
     }
 }

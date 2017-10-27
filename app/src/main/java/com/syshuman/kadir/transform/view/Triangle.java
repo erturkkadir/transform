@@ -6,6 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import javax.microedition.khronos.opengles.GL;
+import javax.microedition.khronos.opengles.GL10;
+
 import static android.R.attr.width;
 
 
@@ -34,8 +37,9 @@ public class Triangle {
     // number of coordinates per vertex in this array
     private final int COORDS_PER_VERTEX = 3;
     private float triangleCoords[] = {
-            0.0f,  0.0f, 0.0f, // top
-            1.0f,  1.0f, 1.0f, // bottom left
+            0.0f,  1.0f, 0.0f, // top
+            1.0f,  -1.0f, 1.0f, // bottom left
+            1.0f,  1.0f, 1.0f, // bottom right
 
 
     };
@@ -79,8 +83,10 @@ public class Triangle {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);    // Apply the projection and view transformation
         MyGLRenderer.checkGlError("glUniformMatrix4fv");
 
-        GLES20.glDrawArrays(GLES20.GL_LINES, 0, vertexCount);                   // Draw the triangle
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);                   // Draw the triangle
         GLES20.glDisableVertexAttribArray(mPositionHandle);                     // Disable vertex array
     }
+
+
 
 }
