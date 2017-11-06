@@ -9,7 +9,6 @@ import android.media.MediaRecorder;
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
-import com.syshuman.kadir.transform.view.MyGraph;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -34,16 +33,7 @@ public class SoundData {
 
     private FFT fft;
 
-    public SoundData(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
-
-        this.sgn_len = sgn_len;
-        this.sgn_frq = sgn_frq;
-        this.dyn_amp = dyn_amp; // False default
-        this.fft_dim = fft_dim; // 3D default
-        audioData = new short[sgn_len];
-        c_data = new Complex(sgn_len);
-        // g_data = new double[sgn_len][sgn_len][sgn_len];
-        utils = new Utils(activity);
+    public SoundData() {
 
         aThread = new Thread() {
             @Override
@@ -57,7 +47,17 @@ public class SoundData {
         };
     }
 
-    public void init() {
+    public void init(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
+
+        this.sgn_len = sgn_len;
+        this.sgn_frq = sgn_frq;
+        this.dyn_amp = dyn_amp; // False default
+        this.fft_dim = fft_dim; // 3D default
+        audioData = new short[sgn_len];
+        c_data = new Complex(sgn_len);
+        // g_data = new double[sgn_len][sgn_len][sgn_len];
+        utils = new Utils(activity);
+
 
         int channel = AudioFormat.CHANNEL_IN_MONO;
         int format = AudioFormat.ENCODING_PCM_16BIT;
@@ -87,15 +87,13 @@ public class SoundData {
             return;
         }
 
-        aThread.start();
-
     }
 
 
     public void start() {
-
-        audioRecord.startRecording();
-        aThread.start();
+        if(aThread.getState() == Thread.State.NEW) {
+            aThread.start();
+        }
 
     }
 
@@ -103,8 +101,6 @@ public class SoundData {
 
         audioRecord.stop();
         aThread.interrupt();
-        audioRecord.release();
-
     }
 
 

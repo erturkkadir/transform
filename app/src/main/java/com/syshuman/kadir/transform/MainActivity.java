@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
-import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -15,7 +14,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -30,6 +28,7 @@ import com.syshuman.kadir.transform.model.Preferences;
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.view.MyGLRenderer;
 import com.syshuman.kadir.transform.view.MyGLSurfaceView;
+import com.syshuman.kadir.transform.view.Fractal;
 
 import java.util.HashMap;
 
@@ -38,14 +37,12 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.status) FloatingActionButton status;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @BindView(R.id.glSurfaceView) MyGLSurfaceView glSurfaceView;
-
 
     private SoundData soundData;
     private Boolean inRecord = false;
@@ -57,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String fft_dim = "3D";
 
     private Utils utils;
+    private Fractal fractal;
 
+    private MyGLRenderer renderer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getPermissions();
 
         setSupportActionBar(toolbar);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -87,15 +85,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initialize() {
 
-
         String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         // log_visit("http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
 
         getDefaults(); /* set default values of each transforms */
 
 
-        soundData = new SoundData(this, sgn_len, sgn_frq, dyn_amp, fft_dim);
-        soundData.init();
+       
+        soundData = new SoundData();
+        soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim);
 
         status.setOnClickListener(onStatusClicked);
 
