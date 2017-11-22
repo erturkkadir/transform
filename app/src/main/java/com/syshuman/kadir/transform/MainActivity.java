@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -28,7 +30,6 @@ import com.syshuman.kadir.transform.model.Preferences;
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.view.MyGLRenderer;
 import com.syshuman.kadir.transform.view.MyGLSurfaceView;
-import com.syshuman.kadir.transform.view.Fractal;
 
 import java.util.HashMap;
 
@@ -53,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean dyn_amp = false;
     private String fft_dim = "3D";
 
-    private Utils utils;
-    private Fractal fractal;
 
     private MyGLRenderer renderer;
 
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        utils = new Utils(this);
 
         initialize();
     }
@@ -90,17 +88,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         getDefaults(); /* set default values of each transforms */
 
+        renderer = new MyGLRenderer();
+        glSurfaceView.setRenderer(renderer);
 
-       
-        soundData = new SoundData();
-        soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim);
-
-        status.setOnClickListener(onStatusClicked);
+        soundData = new SoundData(renderer);
+        if (soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim)) {
+            enableProgram();
+        } else {
+            disableProgram();
+        }
 
     }
 
+    private void disableProgram() {
+        status.setOnClickListener(null);
+        status.setEnabled(false);
+        status.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+    }
 
-    public void getDefaults() {
+    private void enableProgram() {
+        status.setOnClickListener(onStatusClicked);
+        status.setEnabled(true);
+        status.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.colorPrimary)));
+    }
+
+    private void getDefaults() {
         preferences = new Preferences(this);
         HashMap<String, String> prefs = preferences.getAllPrefs();
         sgn_len = Integer.valueOf(prefs.get("sgn_len"));

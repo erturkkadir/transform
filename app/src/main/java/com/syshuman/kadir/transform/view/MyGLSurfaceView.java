@@ -3,14 +3,11 @@ package com.syshuman.kadir.transform.view;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private final MyGLRenderer mRenderer;
     private ScaleGestureDetector mDetector;
 
     float mPreviousX;
@@ -21,69 +18,67 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public MyGLSurfaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         setEGLContextClientVersion(2);
-        mRenderer = new MyGLRenderer();
         mDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        setRenderer(mRenderer);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         mDetector.onTouchEvent(e);
-        if(e.getActionIndex()>1){
+        if (e.getActionIndex() > 1) {
             return true;
         }
 
         int numFingers = e.getPointerCount();
-        switch (e.getAction()&MotionEvent.ACTION_MASK) {
+        switch (e.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
                 mPreviousX = 0.0f;
                 mPreviousY = 0.0f;
 
                 //Get the average of the fingers on the screen as the current position
-                for(int i =0;i<numFingers;i++){
-                    mPreviousX+=e.getX(i);
-                    mPreviousY+=e.getY(i);
+                for (int i = 0; i < numFingers; i++) {
+                    mPreviousX += e.getX(i);
+                    mPreviousY += e.getY(i);
                 }
 
-                mPreviousX/=numFingers;
-                mPreviousY/=numFingers;
+                mPreviousX /= numFingers;
+                mPreviousY /= numFingers;
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 mPreviousX = 0.0f;
                 mPreviousY = 0.0f;
 
                 //Get the average of the remaining fingers on the screen as the current position
-                for(int i =0;i<numFingers;i++){
-                    if(i==e.getActionIndex())continue;
-                    mPreviousX+=e.getX(i);
-                    mPreviousY+=e.getY(i);
+                for (int i = 0; i < numFingers; i++) {
+                    if (i == e.getActionIndex()) continue;
+                    mPreviousX += e.getX(i);
+                    mPreviousY += e.getY(i);
                     //Log.d("FractalSurfaceView","Pointer Up: " + String.valueOf(e.get)+ ", " +String.valueOf(e.getActionIndex()));
                 }
-                numFingers-=1;
-                mPreviousX/=numFingers;
-                mPreviousY/=numFingers;
+                numFingers -= 1;
+                mPreviousX /= numFingers;
+                mPreviousY /= numFingers;
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                float tempX = 0.0f, tempY=0.0f;
+                float tempX = 0.0f, tempY = 0.0f;
 
                 //Get the average of the fingers on the screen as the current position
-                for(int i =0;i<numFingers;i++){
-                    tempX+=e.getX(i);
-                    tempY+=e.getY(i);
+                for (int i = 0; i < numFingers; i++) {
+                    tempX += e.getX(i);
+                    tempY += e.getY(i);
                 }
 
-                tempX/=numFingers;
-                tempY/=numFingers;
+                tempX /= numFingers;
+                tempY /= numFingers;
 
-                if(lastNumFingers==numFingers){
-                    //Sometimes a third finger doesn't register under point, so track it separately
-                    mRenderer.add(tempX - mPreviousX, tempY - mPreviousY);
+                if (lastNumFingers == numFingers) {
+                    // Sometimes a third finger doesn't register under point, so track it separately
+                    //mRenderer.add(tempX - mPreviousX, tempY - mPreviousY);
                 }
 
-                mPreviousX=tempX;
-                mPreviousY=tempY;
+                mPreviousX = tempX;
+                mPreviousY = tempY;
 
                 requestRender();
                 break;
@@ -96,7 +91,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+            //mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             return true;
         }
     }

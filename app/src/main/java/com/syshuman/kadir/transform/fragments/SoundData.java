@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.opengl.GLES31;
 
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
+import com.syshuman.kadir.transform.view.MyGLRenderer;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -27,13 +29,23 @@ public class SoundData {
     private short[] audioData;
     private Complex c_data;
     private Utils utils;
+    private boolean drawGraph = false;
 
     private boolean dyn_amp;
     private String fft_dim;
 
     private FFT fft;
+    private MyGLRenderer renderer;
 
-    public SoundData() {
+
+
+
+
+
+
+
+    public SoundData(MyGLRenderer renderer) {
+        this.renderer = renderer;
 
         aThread = new Thread() {
             @Override
@@ -45,9 +57,10 @@ public class SoundData {
                 }
             }
         };
+        aThread.start();
     }
 
-    public void init(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
+    public boolean init(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
 
         this.sgn_len = sgn_len;
         this.sgn_frq = sgn_frq;
@@ -63,17 +76,16 @@ public class SoundData {
         int format = AudioFormat.ENCODING_PCM_16BIT;
         int source = MediaRecorder.AudioSource.MIC;
 
-
         bufferSize = AudioRecord.getMinBufferSize(sgn_frq, channel, format);
 
         if (sgn_len > bufferSize) {
-            utils.showError("Signal length must smaller than buffersize. Signal Length : " + sgn_len + " buffer size : " + bufferSize);
-            return;
+            utils.showError("Signal length must smaller than buffer size. Signal Length : " + sgn_len + " buffer size : " + bufferSize);
+            return false;
         }
 
         if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE || bufferSize < 0) {
             utils.showError("Buffer size error or AudioRecord error ");
-            return;
+            return false;
         }
 
         audioRecord = new AudioRecord(source,
@@ -84,45 +96,43 @@ public class SoundData {
 
         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
             utils.showError("Audio could not initialize ");
-            return;
+            return false;
         }
-
+        return true;
     }
 
 
     public void start() {
-        if(aThread.getState() == Thread.State.NEW) {
-            aThread.start();
-        }
+
+        audioRecord.startRecording();
+        drawGraph = true;
 
     }
 
     public void stop() {
 
         audioRecord.stop();
-        aThread.interrupt();
+        drawGraph = false;
+
     }
 
 
     private void recordAudio() throws InterruptedException {
 
-        audioRecord.startRecording();
         Thread.sleep(50);
-        int offset = 0, read = 1;
+        int offset = 0, size;
         while (offset < bufferSize) {
-            int size = audioRecord.read(audioData, 0, sgn_len);
+            size = audioRecord.read(audioData, 0, sgn_len);
             offset += size;
-            if (read <= 0) break;
         }
-        audioRecord.stop();
-        audioData = Arrays.copyOf(audioData, sgn_len);
         callGraph(audioData);
+
     }
 
     private void callGraph(short[] data) {
         float[] dataBuffer;
 
-        dataBuffer = new float[sgn_len*3];
+        dataBuffer = new float[sgn_len * 3];
 
         for (int i = 0; i < sgn_len; i++) {
             c_data.d_real[i] = data[i];
@@ -138,10 +148,14 @@ public class SoundData {
             double x = i * df * 1.0;
             double y = 0;
             double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]);
-            dataBuffer[3*i] = (float) x;
-            dataBuffer[3*i+1] = (float) y;
-            dataBuffer[3*i+2] = (float) z;
+            dataBuffer[3 * i] = (float) x;
+            dataBuffer[3 * i + 1] = (float) y;
+            dataBuffer[3 * i + 2] = (float) z;
         }
+        //renderer.setData(dataBuffer);
+        //renderer.setDrawStatus(true);
 
     }
+
+
 }
