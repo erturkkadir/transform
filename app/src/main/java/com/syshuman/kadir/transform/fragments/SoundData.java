@@ -147,12 +147,16 @@ public class SoundData {
         for (int i = 0; i < sgn_len / 2; i++) {
             double x = i * df * 1.0;
             double y = 0;
-            double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]);
-            dataBuffer[3 * i] = (float) x;
-            dataBuffer[3 * i + 1] = (float) y;
-            dataBuffer[3 * i + 2] = (float) z;
+            double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]) / 1024.0;
+            dataBuffer[6 * i + 0] = (float) x;
+            dataBuffer[6 * i + 1] = (float) y;
+            dataBuffer[6 * i + 2] = (float) z;
+            dataBuffer[6 * i + 3] = 0.5f;
+            dataBuffer[6 * i + 4] = 0.5f;
+            dataBuffer[6 * i + 5] = 0.5f;
         }
-        //renderer.setData(dataBuffer);
+
+        renderer.setData(dataBuffer);
         //renderer.setDrawStatus(true);
 
     }

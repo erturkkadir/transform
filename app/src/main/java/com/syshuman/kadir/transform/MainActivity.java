@@ -74,9 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         navigationView.setNavigationItemSelectedListener(this);
-
 
         initialize();
     }
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         getDefaults(); /* set default values of each transforms */
 
-        renderer = new MyGLRenderer();
+        renderer = new MyGLRenderer(sgn_len);
         glSurfaceView.setRenderer(renderer);
 
         soundData = new SoundData(renderer);
