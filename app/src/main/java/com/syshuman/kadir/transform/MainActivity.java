@@ -27,7 +27,6 @@ import android.view.MenuItem;
 
 import com.syshuman.kadir.transform.fragments.SoundData;
 import com.syshuman.kadir.transform.model.Preferences;
-import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.view.MyGLRenderer;
 import com.syshuman.kadir.transform.view.MyGLSurfaceView;
 
@@ -81,16 +80,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initialize() {
 
-        String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        // String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         // log_visit("http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
 
-        getDefaults(); /* set default values of each transforms */
+        getDefaults();          /* set default values of each transforms */
 
-        renderer = new MyGLRenderer(sgn_len);
-        glSurfaceView.setRenderer(renderer);
-
-        soundData = new SoundData(renderer);
+        soundData = new SoundData(context);
         if (soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim)) {
+            renderer = new MyGLRenderer(sgn_len, soundData);
+            glSurfaceView.setRenderer(renderer);
             enableProgram();
         } else {
             disableProgram();

@@ -2,18 +2,16 @@ package com.syshuman.kadir.transform.fragments;
 
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.opengl.GLES31;
 
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
 import com.syshuman.kadir.transform.fft.FFT;
 import com.syshuman.kadir.transform.view.MyGLRenderer;
-
-import java.nio.FloatBuffer;
-import java.util.Arrays;
 
 public class SoundData {
 
@@ -24,7 +22,7 @@ public class SoundData {
     private int sgn_len;  // 1024
     private int sgn_frq; // 44100
     private int bufferSize;
-
+    float[] dataBuffer;
 
     private short[] audioData;
     private Complex c_data;
@@ -35,17 +33,17 @@ public class SoundData {
     private String fft_dim;
 
     private FFT fft;
+    private Context context;
+
     private MyGLRenderer renderer;
+    public float xMin = 0, xMax = 0, yMin = 0, yMax = 0, zMin = 0, zMax = 0;
 
 
 
+    public SoundData(Context context) {
+        this.context = context;
 
-
-
-
-
-    public SoundData(MyGLRenderer renderer) {
-        this.renderer = renderer;
+        dataBuffer = new float[sgn_len * 7]; // 1024*7 = 7168
 
         aThread = new Thread() {
             @Override
@@ -60,6 +58,10 @@ public class SoundData {
         aThread.start();
     }
 
+    public void setRenderer(MyGLRenderer renderer) {
+        this.renderer = renderer;
+    }
+
     public boolean init(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
 
         this.sgn_len = sgn_len;
@@ -68,7 +70,7 @@ public class SoundData {
         this.fft_dim = fft_dim; // 3D default
         audioData = new short[sgn_len];
         c_data = new Complex(sgn_len);
-        // g_data = new double[sgn_len][sgn_len][sgn_len];
+
         utils = new Utils(activity);
 
 
@@ -130,9 +132,6 @@ public class SoundData {
     }
 
     private void callGraph(short[] data) {
-        float[] dataBuffer;
-
-        dataBuffer = new float[sgn_len * 3];
 
         for (int i = 0; i < sgn_len; i++) {
             c_data.d_real[i] = data[i];
@@ -144,21 +143,39 @@ public class SoundData {
 
         float df = (sgn_frq * 1.0f) / (sgn_len * 1.0f); // 44100 / 1024 = 43.06 Hz  is delta freq
 
-        for (int i = 0; i < sgn_len / 2; i++) {
+        for (int i = 0; i < sgn_len/2; i++) { /* First Half  0 - 511 */
             double x = i * df * 1.0;
-            double y = 0;
-            double z = Math.sqrt(c_data.d_real[i] * c_data.d_real[i] + c_data.d_imag[i] * c_data.d_imag[i]) / 1024.0;
-            dataBuffer[6 * i + 0] = (float) x;
-            dataBuffer[6 * i + 1] = (float) y;
-            dataBuffer[6 * i + 2] = (float) z;
-            dataBuffer[6 * i + 3] = 0.5f;
-            dataBuffer[6 * i + 4] = 0.5f;
-            dataBuffer[6 * i + 5] = 0.5f;
+            double y = Math.sqrt(c_data.d_imag[i] * c_data.d_imag[i] + c_data.d_real[i] * c_data.d_real[i]);
+            double z = 0; // c_data.d_real[i];
+            dataBuffer[7 * i + 0] = (float) x;
+            dataBuffer[7 * i + 1] = (float) y;
+            dataBuffer[7 * i + 2] = (float) z;
+            dataBuffer[7 * i + 3] = 0.0f;
+            dataBuffer[7 * i + 4] = 0.0f;
+            dataBuffer[7 * i + 5] = 1.0f;
+            dataBuffer[7 * i + 6] = 1.0f;
+            if(x < xMin) xMin = (float) x; if(x > xMax) xMax = (float) x;
+            if(y < yMin) yMin = (float) y; if(y > yMax) yMax = (float) y;
+            if(z < zMin) zMin = (float) z; if(z > zMax) zMax = (float) z;
+
+        }
+        for(int i = sgn_len/2; i< sgn_len; i++) { /* Second half  411 - 1023 */
+            dataBuffer[7 * i + 0] = 0;
+            dataBuffer[7 * i + 1] = 0;
+            dataBuffer[7 * i + 2] = 0;
+            dataBuffer[7 * i + 3] = 0.0f;
+            dataBuffer[7 * i + 4] = 0.0f;
+            dataBuffer[7 * i + 5] = 1.0f;
+            dataBuffer[7 * i + 6] = 1.0f;
         }
 
-        renderer.setData(dataBuffer);
+
+        renderer.setData(dataBuffer, xMin, xMax, yMin, yMax, zMin, zMax);
         //renderer.setDrawStatus(true);
 
+    }
+    public float[] getData() {
+        return dataBuffer;
     }
 
 

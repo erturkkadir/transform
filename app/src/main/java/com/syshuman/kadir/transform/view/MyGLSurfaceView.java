@@ -19,6 +19,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         super(context, attributeSet);
         setEGLContextClientVersion(2);
         mDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
