@@ -92,7 +92,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         lookX = 0.0f; lookY = 0.0f; lookZ =  0.0f;
         upX   = 0.0f; upY   = 1.0f; upZ   =  0.0f;
 
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+       // Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         String vertexShader = getVertexShader();
         String fragmentShader = getFragmentShader();
@@ -139,7 +139,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             }
         } else throw new RuntimeException("Error creating program.");
 
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
+        //mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
 
@@ -156,6 +156,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
+        /*
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
         */
     }
@@ -171,8 +172,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         long time = SystemClock.uptimeMillis() % 50000L;        // Do a complete rotation every 10 seconds.
         float angleInDegrees = (360.0f / 100000.0f) * ((int) time);
 
-        Matrix.setIdentityM(mModelMatrix, 0);                   // Draw the triangle facing straight on.
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        //Matrix.setIdentityM(mModelMatrix, 0);                   // Draw the triangle facing straight on.
+        //Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
 
         gl.glEnableClientState(GLES20.GL_VERTEX_ATTRIB_ARRAY_TYPE);
 
@@ -213,13 +214,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,  mStrideBytes, aTriangleBuffer);
         mColorHandle = GLES20.glGetUniformLocation(programHandle, "vColor");
 
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
+        //mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
         GLES20.glDrawArrays(GLES20.GL_LINES, 0, sgn_len);
 
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);          // model * view
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);      // model * view * projection
+        //Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);          // model * view
+        //Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);      // model * view * projection
 
         GLES20.glLineWidth(5f);
         //GLES20.glDrawElements(GLES20.GL_LINES, 3, GLES20.GL_UNSIGNED_SHORT, aTriangleBuffer);

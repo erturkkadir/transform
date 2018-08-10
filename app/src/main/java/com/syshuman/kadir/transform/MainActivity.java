@@ -35,6 +35,8 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
@@ -67,15 +69,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ButterKnife.bind(this);
 
-        getPermissions();
-
+  //      getPermissions();
+/*
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-
-        initialize();
+*/
+       // initialize();
     }
 
     private void initialize() {
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         soundData = new SoundData(context);
         if (soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim)) {
-            renderer = new MyGLRenderer(sgn_len, soundData);
+            //renderer = new MyGLRenderer(sgn_len, soundData);
             glSurfaceView.setRenderer(renderer);
             enableProgram();
         } else {
