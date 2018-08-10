@@ -1,7 +1,6 @@
 package com.syshuman.kadir.transform.view;
 
 import android.opengl.GLES20;
-import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
@@ -56,7 +55,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float[] axisData;                           // Model data
     private FloatBuffer axisVertices;                   // Model vertices
 
-
+    private int mMVPMatrixHandle;                        // Model position info
     private int mPositionHandle;                        // Model position info
     private int mColorHandle;                           // Model color info
 
@@ -75,11 +74,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float upX, upY, upZ;
     private int sgn_len;
 
-    public MyGLRenderer(SoundData soundData) {
+    public MyGLRenderer(int sgn_len, SoundData soundData) {
         this.soundData = soundData;
         axisData = soundData.getData();
         axisVertices = ByteBuffer.allocateDirect(axisData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         axisVertices.put(axisData).position(0);
+        this.sgn_len = sgn_len;
     }
 
 
@@ -88,11 +88,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        eyeX  = 1.5f; eyeY  = 1.5f; eyeZ  = -1.5f;
+        eyeX  = 0.5f; eyeY  = 0.5f; eyeZ  = -0.5f;
         lookX = 0.0f; lookY = 0.0f; lookZ =  0.0f;
         upX   = 0.0f; upY   = 1.0f; upZ   =  0.0f;
 
-       // Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(viewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         String vertexShader = getVertexShader();
         String fragmentShader = getFragmentShader();
@@ -139,7 +139,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             }
         } else throw new RuntimeException("Error creating program.");
 
-        //mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
 
@@ -155,16 +155,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         final float bottom = -1.0f;
         final float top = 1.0f;
         final float near = 1.0f;
-        final float far = 10.0f;
-        /*
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
-        */
+        final float far = 100.0f;
+
+        Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
 
-        //Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(viewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -172,12 +171,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         long time = SystemClock.uptimeMillis() % 50000L;        // Do a complete rotation every 10 seconds.
         float angleInDegrees = (360.0f / 100000.0f) * ((int) time);
 
-        //Matrix.setIdentityM(mModelMatrix, 0);                   // Draw the triangle facing straight on.
-        //Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        Matrix.setIdentityM(modelMatrix, 0);                   // Draw the triangle facing straight on.
+        Matrix.rotateM(modelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
 
         gl.glEnableClientState(GLES20.GL_VERTEX_ATTRIB_ARRAY_TYPE);
 
-        drawTriangle(axisVertices);
+        // drawTriangle(axisVertices);
 
         gl.glDisableClientState(GLES20.GL_VERTEX_ATTRIB_ARRAY_TYPE);
 
@@ -205,7 +204,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 + "}                              \n";
     }
 
-    private void drawTriangle(final FloatBuffer aTriangleBuffer) {
+    private void drawTriangle(FloatBuffer aTriangleBuffer) {
 
         aTriangleBuffer.position(0);                                  // Pass in the position information
 
@@ -214,16 +213,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,  mStrideBytes, aTriangleBuffer);
         mColorHandle = GLES20.glGetUniformLocation(programHandle, "vColor");
 
-        //mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
         GLES20.glDrawArrays(GLES20.GL_LINES, 0, sgn_len);
 
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
-        //Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);          // model * view
-        //Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);      // model * view * projection
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);          // model * view
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);      // model * view * projection
 
         GLES20.glLineWidth(5f);
-        //GLES20.glDrawElements(GLES20.GL_LINES, 3, GLES20.GL_UNSIGNED_SHORT, aTriangleBuffer);
+        GLES20.glDrawElements(GLES20.GL_LINES, 3, GLES20.GL_UNSIGNED_SHORT, aTriangleBuffer);
         GLES20.glDisableVertexAttribArray(mColorHandle);
         GLES20.glDisableVertexAttribArray(mPositionHandle);
 
@@ -236,4 +235,3 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         axisVertices.put(data).position(0);
     }
 }
-

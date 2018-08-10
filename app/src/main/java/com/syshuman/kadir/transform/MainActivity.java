@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -69,27 +70,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ButterKnife.bind(this);
 
-  //      getPermissions();
-/*
+        getPermissions();
+
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-*/
-       // initialize();
+
+        initialize();
     }
 
     private void initialize() {
 
-        // String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        // log_visit("http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
+         String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+         Log.d("MainActivity", "http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
 
         getDefaults();          /* set default values of each transforms */
 
         soundData = new SoundData(context);
         if (soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim)) {
-            //renderer = new MyGLRenderer(sgn_len, soundData);
+            renderer = new MyGLRenderer(sgn_len, soundData);
             glSurfaceView.setRenderer(renderer);
             enableProgram();
         } else {

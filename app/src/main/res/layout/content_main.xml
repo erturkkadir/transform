@@ -22,43 +22,37 @@
     <LinearLayout
 
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
-        android:background="?android:attr/colorBackground"
+        android:background="@android:color/transparent"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btnFourier"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_weight="1"
 
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_fourier" />
+            app:srcCompat="?android:attr/fingerprintAuthDrawable" />
 
         <ImageButton
             android:id="@+id/btnLaplace"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_laplace" />
+            app:srcCompat="?android:attr/textSelectHandle" />
 
 
         <ImageButton
             android:id="@+id/btnZ"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_z" />
-
+            app:srcCompat="?android:attr/actionModePasteDrawable" />
 
     </LinearLayout>
 

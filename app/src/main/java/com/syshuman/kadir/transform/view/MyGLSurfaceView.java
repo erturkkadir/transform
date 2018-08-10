@@ -14,12 +14,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
     float mPreviousY;
     int lastNumFingers = 0;
 
+    private MyGLRenderer mRenderer;
 
     public MyGLSurfaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-//        setEGLContextClientVersion(2);
-//        mDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        //setEGLContextClientVersion(3);
+
+        mDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+
     }
 
     @Override
@@ -92,7 +94,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            //mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+            // mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             return true;
         }
     }
