@@ -25,34 +25,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/transparent"
-        android:orientation="horizontal">
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:theme="?android:attr/ratingBarStyleSmall">
 
         <ImageButton
             android:id="@+id/btnFourier"
-            style="@android:style/Widget.DeviceDefault.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:contentDescription="@string/app_name"
-            app:srcCompat="?android:attr/fingerprintAuthDrawable" />
+            android:elevation="11dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_fourier" />
 
         <ImageButton
             android:id="@+id/btnLaplace"
-            style="@android:style/Widget.DeviceDefault.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/app_name"
-            app:srcCompat="?android:attr/textSelectHandle" />
+            android:elevation="11dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_laplace" />
 
 
         <ImageButton
             android:id="@+id/btnZ"
-            style="@android:style/Widget.DeviceDefault.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/app_name"
-            app:srcCompat="?android:attr/actionModePasteDrawable" />
+            android:elevation="10dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_z" />
 
     </LinearLayout>
 
