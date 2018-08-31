@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 import com.syshuman.kadir.transform.utils.Utils;
 import com.syshuman.kadir.transform.fft.Complex;
@@ -17,12 +18,17 @@ public class SoundData {
 
     //private int bufferSize;
     private AudioRecord audioRecord;
-    private Thread aThread;
 
     private int sgn_len;  // 1024
     private int sgn_frq; // 44100
     private int bufferSize;
-    float[] dataBuffer;
+
+    private int channel;
+    private int format;
+    private int source;
+    private int bytesPerElement = 2; // 2 bytes in 16 bit format
+
+    private float[] dataBuffer;
 
     private short[] audioData;
     private Complex c_data;
@@ -31,76 +37,77 @@ public class SoundData {
 
     private boolean dyn_amp;
     private String fft_dim;
+    private Boolean isRecording = false;
+    private Thread recordingThread;
 
     private FFT fft;
     private Context context;
 
-    private MyGLRenderer renderer;
     public float xMin = 0, xMax = 0, yMin = 0, yMax = 0, zMin = 0, zMax = 0;
-
-
 
     public SoundData(Context context) {
         this.context = context;
 
-        dataBuffer = new float[sgn_len * 7]; // 1024*7 = 7168
-
-        aThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    recordAudio();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        aThread.start();
-    }
-
-    public void setRenderer(MyGLRenderer renderer) {
-        this.renderer = renderer;
     }
 
     public boolean init(Activity activity, int sgn_len, int sgn_frq, boolean dyn_amp, String fft_dim) {
 
-        this.sgn_len = sgn_len;
-        this.sgn_frq = sgn_frq;
+        this.sgn_len = sgn_len; // 1024 points
+        this.sgn_frq = sgn_frq; // 44100 Hz ==> Sample Rate
         this.dyn_amp = dyn_amp; // False default
         this.fft_dim = fft_dim; // 3D default
+
+        dataBuffer = new float[sgn_len];
+        for(int i=0; i<sgn_len;i++) dataBuffer[i] = 1.1f;
+
         audioData = new short[sgn_len];
         c_data = new Complex(sgn_len);
 
         utils = new Utils(activity);
 
+        channel = AudioFormat.CHANNEL_IN_MONO;
+        format = AudioFormat.ENCODING_PCM_16BIT;
+        source = MediaRecorder.AudioSource.MIC;
 
-        int channel = AudioFormat.CHANNEL_IN_MONO;
-        int format = AudioFormat.ENCODING_PCM_16BIT;
-        int source = MediaRecorder.AudioSource.MIC;
-
-        bufferSize = AudioRecord.getMinBufferSize(sgn_frq, channel, format);
+        bufferSize = AudioRecord.getMinBufferSize(sgn_frq, channel, format); /* 3584  44100 Hz, Mono, 16 bit*/
 
         if (sgn_len > bufferSize) {
             utils.showError("Signal length must smaller than buffer size. Signal Length : " + sgn_len + " buffer size : " + bufferSize);
             return false;
         }
 
-        if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE || bufferSize < 0) {
+        if ( (bufferSize == AudioRecord.ERROR_BAD_VALUE) || (bufferSize < 0) ) {
             utils.showError("Buffer size error or AudioRecord error ");
             return false;
         }
 
-        audioRecord = new AudioRecord(source,
-                sgn_frq,
-                channel,
-                format,
-                2 * bufferSize);
+        startRecording();
+
+        return true;
+    }
+
+
+    private void startRecording() {
+
+        audioRecord =  new AudioRecord(source, sgn_frq, channel, format,bytesPerElement*sgn_len);
 
         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
             utils.showError("Audio could not initialize ");
-            return false;
+            return;
         }
-        return true;
+
+        audioRecord.startRecording();
+
+        isRecording = true;
+
+        recordingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int size = audioRecord.read(audioData, 0, sgn_len);
+
+            }
+        });
+        recordingThread.start();
     }
 
 
@@ -112,24 +119,9 @@ public class SoundData {
     }
 
     public void stop() {
-
         audioRecord.stop();
-        drawGraph = false;
-
     }
 
-
-    private void recordAudio() throws InterruptedException {
-
-        Thread.sleep(50);
-        int offset = 0, size;
-        while (offset < bufferSize) {
-            size = audioRecord.read(audioData, 0, sgn_len);
-            offset += size;
-        }
-        callGraph(audioData);
-
-    }
 
     private void callGraph(short[] data) {
 
@@ -168,12 +160,9 @@ public class SoundData {
             dataBuffer[7 * i + 5] = 1.0f;
             dataBuffer[7 * i + 6] = 1.0f;
         }
-
-
-        renderer.setData(dataBuffer, xMin, xMax, yMin, yMax, zMin, zMax);
-        //renderer.setDrawStatus(true);
-
     }
+
+
     public float[] getData() {
         return dataBuffer;
     }

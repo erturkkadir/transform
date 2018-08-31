@@ -22,21 +22,21 @@ public class Preferences {
         HashMap<String, String> prefs = new HashMap<>();
 
         // Fourier parameters
-        prefs.put("sgn_len", sharedPreferences.getString("sgn_len", "1024"));  // Signal Length 256, 512, 1024, 2048 points
-        prefs.put("sgn_frq", sharedPreferences.getString("sgn_frq", "44100")); // Sampling rate 22050, 44100 Hz
-        prefs.put("dyn_amp", sharedPreferences.getString("dyn_amp", "false")); // Whether Mag axis to be scaled dynamically or not
-        prefs.put("fft_dim", sharedPreferences.getString("fft_dim", "3D")); // sqrt(a^2+b^2) 2D or f,r,i 3D
+        prefs.put("sgn_len", sharedPreferences.getString("sgn_len", "1024"));   // Signal Length 256, 512, 1024, 2048 points
+        prefs.put("sgn_frq", sharedPreferences.getString("sgn_frq", "44100"));  // Sampling rate 22050, 44100 Hz
+        prefs.put("dyn_amp", sharedPreferences.getString("dyn_amp", "false"));  // Whether Mag axis to be scaled dynamically or not
+        prefs.put("fft_dim", sharedPreferences.getString("fft_dim", "3D"));     // sqrt(a^2+b^2) 2D or f,r,i 3D
 
         // Parameters for Laplace
-        prefs.put("sig_min", sharedPreferences.getString("sig_min", "-2.0")); // Min sigma value
-        prefs.put("sig_max", sharedPreferences.getString("sig_max", "+2.0")); // Maz sigma value
-        prefs.put("sig_step", sharedPreferences.getString("sig_step", "0.1")); // Sigma steps
+        prefs.put("sig_min", sharedPreferences.getString("sig_min", "-2.0"));   // Min sigma value
+        prefs.put("sig_max", sharedPreferences.getString("sig_max", "+2.0"));   // Maz sigma value
+        prefs.put("sig_step", sharedPreferences.getString("sig_step", "0.1"));  // Sigma steps
 
 
         // Parameters for Z
-        prefs.put("rad_min", sharedPreferences.getString("sig_min", "0.0"));  // Min r value (inside the circle)
-        prefs.put("rad_max", sharedPreferences.getString("sig_max", "+2.0")); // Max r value (outside the circle)
-        prefs.put("rad_step", sharedPreferences.getString("sig_step", "0.1")); // Radius steps
+        prefs.put("rad_min", sharedPreferences.getString("sig_min", "0.0"));    // Min r value (inside the circle)
+        prefs.put("rad_max", sharedPreferences.getString("sig_max", "+2.0"));   // Max r value (outside the circle)
+        prefs.put("rad_step", sharedPreferences.getString("sig_step", "0.1"));  // Radius steps
 
         // Last screen settings
         prefs.put("show_form", sharedPreferences.getString("show_form", "2D")); // FT in dimension

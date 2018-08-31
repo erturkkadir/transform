@@ -48,8 +48,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Boolean inRecord = false;
     private Context context;
 
-    private Preferences preferences;
-    private int sgn_len, sgn_frq;
+    Preferences preferences;
+    private int sgn_len = 1024;
+    private int sgn_frq = 44100;
     private boolean dyn_amp = false;
     private String fft_dim = "3D";
 
@@ -87,13 +88,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         soundData = new SoundData(context);
         if (soundData.init(this, sgn_len, sgn_frq, dyn_amp, fft_dim)) {
-            renderer = new MyGLRenderer(sgn_len, soundData);
+            renderer = new MyGLRenderer(soundData);
             glSurfaceView.setRenderer(renderer);
             enableProgram();
         } else {
             disableProgram();
         }
-
     }
 
     private void disableProgram() {
@@ -155,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume() {
         super.onResume();
         glSurfaceView.onResume();
-
     }
 
     @Override

@@ -9,17 +9,29 @@ import android.view.ScaleGestureDetector;
 public class MyGLSurfaceView extends GLSurfaceView {
 
     private ScaleGestureDetector mDetector;
+    private Context mContext;
 
     float mPreviousX;
     float mPreviousY;
     int lastNumFingers = 0;
 
+    public MyGLSurfaceView(Context context) {
+        super(context);
+        this.mContext = context;
+        init();
+    }
 
     public MyGLSurfaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        setEGLContextClientVersion(2);
-        mDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        this.mContext = context;
+        init();
+    }
+
+    private void init() {
+        setEGLContextClientVersion(3);
+        setPreserveEGLContextOnPause(true);
+//        mDetector = new ScaleGestureDetector(mContext, new ScaleListener());
+ //       setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     @Override

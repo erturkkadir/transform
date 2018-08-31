@@ -17,10 +17,10 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
-    private float[] modelMatrix         = new float[16];        // Model Matrix
-    private float[] viewMatrix          = new float[16];        // View Matrix
-    private float[] projectionMatrix    = new float[16];        // Projection Matrix
-    private float[] mvpMatrix           = new float[16];        // MVP Combined Matrix
+    private float[] mModelMatrix        = new float[16];        // Model Matrix
+    private float[] mViewMatrix         = new float[16];        // View Matrix
+    private float[] mProjectionMatrix   = new float[16];        // Projection Matrix
+    private float[] mMVPMatrix          = new float[16];        // MVP Combined Matrix
     private float   mAngle;
 
 
@@ -57,6 +57,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private FloatBuffer axisVertices;                   // Model vertices
 
 
+    private int mMVPMatrixHandle;
     private int mPositionHandle;                        // Model position info
     private int mColorHandle;                           // Model color info
 
@@ -77,22 +78,28 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public MyGLRenderer(SoundData soundData) {
         this.soundData = soundData;
-        axisData = soundData.getData();
+        axisData = soundData.getData(); /* 1024 points all 1.1 */
         axisVertices = ByteBuffer.allocateDirect(axisData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         axisVertices.put(axisData).position(0);
     }
 
+    public void setData(SoundData soundData, int sgn_len) {
+        this.soundData = soundData;
+        this.sgn_len = sgn_len;
+    }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        eyeX  = 1.5f; eyeY  = 1.5f; eyeZ  = -1.5f;
+        eyeX  = 0.5f; eyeY  = 0.5f; eyeZ  = -0.5f;
         lookX = 0.0f; lookY = 0.0f; lookZ =  0.0f;
         upX   = 0.0f; upY   = 1.0f; upZ   =  0.0f;
 
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        float[] mViewMatrix= null;
+
+      //  Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         String vertexShader = getVertexShader();
         String fragmentShader = getFragmentShader();
@@ -157,7 +164,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         final float near = 1.0f;
         final float far = 10.0f;
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
-        */
+        
     }
 
     @Override
