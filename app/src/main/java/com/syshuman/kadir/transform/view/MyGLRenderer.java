@@ -56,8 +56,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float[] axisData;                           // Model data
     private FloatBuffer axisVertices;                   // Model vertices
 
-
-    private int mMVPMatrixHandle;
+    private int mMVPMatrixHandle;                        // Model position info
     private int mPositionHandle;                        // Model position info
     private int mColorHandle;                           // Model color info
 
@@ -76,11 +75,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float upX, upY, upZ;
     private int sgn_len;
 
-    public MyGLRenderer(SoundData soundData) {
+    public MyGLRenderer(int sgn_len, SoundData soundData) {
         this.soundData = soundData;
         axisData = soundData.getData(); /* 1024 points all 1.1 */
         axisVertices = ByteBuffer.allocateDirect(axisData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         axisVertices.put(axisData).position(0);
+        this.sgn_len = sgn_len;
     }
 
     public void setData(SoundData soundData, int sgn_len) {
@@ -96,6 +96,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         eyeX  = 0.5f; eyeY  = 0.5f; eyeZ  = -0.5f;
         lookX = 0.0f; lookY = 0.0f; lookZ =  0.0f;
         upX   = 0.0f; upY   = 1.0f; upZ   =  0.0f;
+
 
         float[] mViewMatrix= null;
 
@@ -170,7 +171,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
 
-        //Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -183,7 +184,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         gl.glEnableClientState(GLES20.GL_VERTEX_ATTRIB_ARRAY_TYPE);
 
-        drawTriangle(axisVertices);
+        // drawTriangle(axisVertices);
 
         gl.glDisableClientState(GLES20.GL_VERTEX_ATTRIB_ARRAY_TYPE);
 
@@ -211,7 +212,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 + "}                              \n";
     }
 
-    private void drawTriangle(final FloatBuffer aTriangleBuffer) {
+    private void drawTriangle(FloatBuffer aTriangleBuffer) {
 
         aTriangleBuffer.position(0);                                  // Pass in the position information
 
@@ -229,7 +230,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);      // model * view * projection
 
         GLES20.glLineWidth(5f);
-        //GLES20.glDrawElements(GLES20.GL_LINES, 3, GLES20.GL_UNSIGNED_SHORT, aTriangleBuffer);
+        GLES20.glDrawElements(GLES20.GL_LINES, 3, GLES20.GL_UNSIGNED_SHORT, aTriangleBuffer);
         GLES20.glDisableVertexAttribArray(mColorHandle);
         GLES20.glDisableVertexAttribArray(mPositionHandle);
 
@@ -242,4 +243,3 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         axisVertices.put(data).position(0);
     }
 }
-

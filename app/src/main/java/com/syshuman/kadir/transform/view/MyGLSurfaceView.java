@@ -104,7 +104,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            //mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+            // mRenderer.zoom(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             return true;
         }
     }

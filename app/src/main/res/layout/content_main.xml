@@ -22,43 +22,43 @@
     <LinearLayout
 
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
-        android:background="?android:attr/colorBackground"
-        android:orientation="horizontal">
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:theme="?android:attr/ratingBarStyleSmall">
 
         <ImageButton
             android:id="@+id/btnFourier"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_weight="1"
-
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_fourier" />
+            android:elevation="11dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_fourier" />
 
         <ImageButton
             android:id="@+id/btnLaplace"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_laplace" />
+            android:elevation="11dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_laplace" />
 
 
         <ImageButton
             android:id="@+id/btnZ"
-            style="@android:style/Widget.Holo.Light.ImageButton"
+            style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_z" />
-
+            android:elevation="10dp"
+            android:padding="5dp"
+            app:srcCompat="@mipmap/ic_z" />
 
     </LinearLayout>
 
