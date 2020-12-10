@@ -15,12 +15,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean dyn_amp = false;
     private String fft_dim = "3D";
 
+    private final  int AUDIO_RECORD_REQUEST_CODE = 111;
+
 
     private MyGLRenderer renderer;
 
@@ -78,11 +82,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        if(getCredential()) {
+            initialize();
+        }
 
-        initialize();
+    }
+
+    private boolean getCredential() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // put your code for Version>=Marshmallow
+            return true;
+        } else {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                Toast.makeText(this,
+                        "App required access to audio", Toast.LENGTH_SHORT).show();
+            }
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO
+            }, AUDIO_RECORD_REQUEST_CODE);
+            return false;
+        }
+
     }
 
     private void initialize() {
+        glSurfaceView = new MyGLSurfaceView(context);
+
+
+
 
          String deviceID = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
          Log.d("MainActivity", "http://www.golaks.ca/android/save.php?lv_id=" + deviceID);
@@ -140,30 +167,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        glSurfaceView.onResume();
+      //  if(glSurfaceView!=null)
+      //      glSurfaceView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        glSurfaceView.onPause();
+     //   if(glSurfaceView!=null)
+     //       glSurfaceView.onPause();
     }
 
     @Override
@@ -254,6 +268,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
         return info.reqGlEsVersion >= 0x20000;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case AUDIO_RECORD_REQUEST_CODE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    initialize();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "Permissions Denied to record audio", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
     }
 
 }
